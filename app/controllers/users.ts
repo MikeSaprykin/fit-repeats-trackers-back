@@ -5,7 +5,7 @@ const router = Router();
 
 const getUsers = async (req, res) => {
   const users = await UserModel.find({}).exec();
-  res.json(users.map(user => user.getPublicUserData()));
+  res.json(users.map((user: any) => user.getPublicUserData()));
 };
 
 const getUserWithId = async (req, res) => {
@@ -39,7 +39,5 @@ router.post('/', addUser);
 router.delete('/:id', deleteUser);
 
 export default {
-  getUsers,
-  getUserWithId,
   router,
 };

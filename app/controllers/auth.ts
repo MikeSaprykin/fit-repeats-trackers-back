@@ -1,12 +1,25 @@
 import UserModel from '../models/user';
-import { compareSync } from 'bcrypt';
+import { Router } from 'express';
 import { ifElse } from 'ramda';
+import { ErrorCodes } from '../helpers';
+import AuthService from '../services/auth';
 
-export const onAuth = async (req, res) => {
-  const { body: { username, password } } = req;
+const router = Router();
+
+const loginUser = async (req, res, next) => {
   ifElse(
-    user => user && compareSync(password, user.password),
-    () => res.json({ token: '123test123' }),
-    () => res.send('EMAIL OR PASSWORD IS INVALID')
-  )(await UserModel.findOne({ username }).exec());
+    AuthService.userExistsAndPasswordsMatch(req.body),
+    user => res.json(AuthService.generateJWT(user)),
+    () => {
+      res
+        .status(ErrorCodes.BAD_REQUEST)
+        .json(AuthService.noUserOrPasswordInvalidMessage);
+    }
+  )(await UserModel.findOne({ username: req.body.username }).exec());
+};
+
+router.post('/login', loginUser);
+
+export default {
+  router,
 };
