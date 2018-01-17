@@ -16,16 +16,19 @@ const userExistsAndPasswordsMatch = ({ password }) => user => {
 const generateRefreshToken = id =>
   id.toString() + crypto.randomBytes(40).toString('hex');
 
-const generateRefreshTokenAndSaveToModel = id => {
+const generateRefreshTokenAndSaveToModel = async (id: string) => {
   const refreshToken = generateRefreshToken(id);
-  UserModel.findOneAndUpdate({ id }, { refreshToken });
+  await UserModel.findByIdAndUpdate(id, { refreshToken: refreshToken });
   return refreshToken;
 };
 
-const generateJWTResponse = ({ id }) => ({
-  token: sign({ id }, auth.secret, { expiresIn: auth.tokenAge }),
-  refreshToken: generateRefreshTokenAndSaveToModel(id),
-});
+const generateJWTResponse = async ({ id }) => {
+  const refreshToken = await generateRefreshTokenAndSaveToModel(id);
+  return {
+    token: sign({ id }, auth.secret, { expiresIn: auth.tokenAge }),
+    refreshToken,
+  };
+};
 
 export default {
   userExistsAndPasswordsMatch,

@@ -9,8 +9,10 @@ const router = Router();
 const loginUser = async (req, res) => {
   ifElse(
     AuthService.userExistsAndPasswordsMatch(req.body),
-    user =>
-      res.status(StatusCodes.OK).send(AuthService.generateJWTResponse(user)),
+    async user =>
+      res
+        .status(StatusCodes.OK)
+        .send(await AuthService.generateJWTResponse(user)),
     () =>
       res
         .status(StatusCodes.BAD_REQUEST)
