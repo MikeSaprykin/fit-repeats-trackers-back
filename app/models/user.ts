@@ -10,6 +10,7 @@ const userSchema = new mongoose.Schema({
   firstName: { type: String },
   lastName: { type: String },
   avatarUrl: { type: String },
+  refreshToken: { type: String },
   // email: {
   //     type: String,
   //     lowercase: true,
