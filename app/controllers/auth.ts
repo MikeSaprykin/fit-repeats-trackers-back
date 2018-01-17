@@ -6,7 +6,7 @@ import AuthService from '../services/auth';
 
 const router = Router();
 
-const loginUser = async (req, res, next) => {
+const loginUser = async (req, res) => {
   ifElse(
     AuthService.userExistsAndPasswordsMatch(req.body),
     user => res.json(AuthService.generateJWT(user)),
