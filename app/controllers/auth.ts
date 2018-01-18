@@ -1,6 +1,6 @@
 import UserModel from '../models/user';
 import { Router } from 'express';
-import { ifElse } from 'ramda';
+import { ifElse, isNil } from 'ramda';
 import { StatusCodes } from '../helpers';
 import AuthService from '../services/auth';
 
@@ -12,7 +12,7 @@ const loginUser = async (req, res) => {
     async user =>
       res
         .status(StatusCodes.OK)
-        .send(await AuthService.generateJWTResponse(user)),
+        .send(await AuthService.generateTokensAndSaveRefreshToken(user)),
     () =>
       res
         .status(StatusCodes.BAD_REQUEST)
@@ -20,7 +20,19 @@ const loginUser = async (req, res) => {
   )(await UserModel.findOne({ username: req.body.username }).exec());
 };
 
+const refreshToken = async (req, res) => {
+  ifElse(
+    isNil,
+    () =>
+      res
+        .status(StatusCodes.BAD_REQUEST)
+        .json(AuthService.refreshTokenInvalidMessage),
+    token => res.json(token)
+  )(await AuthService.refreshTokenAndReturnNewTokens(req.body));
+};
+
 router.post('/login', loginUser);
+router.post('/refresh', refreshToken);
 
 export default {
   router,
