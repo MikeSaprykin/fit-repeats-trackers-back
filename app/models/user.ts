@@ -11,6 +11,7 @@ const userSchema = new mongoose.Schema({
   lastName: { type: String },
   avatarUrl: { type: String },
   refreshToken: { type: String },
+  groups: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Group' }],
   // email: {
   //     type: String,
   //     lowercase: true,

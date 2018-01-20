@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { maybeResult, checkMaybeResult } from '../helpers';
 import UserModel from '../models/user';
 
 const router = Router();
@@ -8,14 +9,13 @@ const getUsers = async (req, res) => {
   res.json(users.map((user: any) => user.getPublicUserData()));
 };
 
-const getUserWithId = async (req, res) => {
-  const [user] = await UserModel.find({ _id: req.params.id })
-    .exec()
-    .catch(e => {
-      res.send('No user with such email');
-      return [];
-    });
-  res.json(user ? user.getUserProfile() : {});
+const getUserProfileById = async (req, res) => {
+  checkMaybeResult(
+    ({ result: user }) => {
+      res.json(user ? user.getUserProfile() : {});
+    },
+    () => res.send('No user with such email')
+  )(await maybeResult(UserModel.findById(req.params.id).exec()));
 };
 
 const getUserDetails = async (req, res) => {
@@ -34,7 +34,7 @@ const deleteUser = async (req, res) => {
 
 router.get('/', getUsers);
 router.get('/profile', getUserDetails);
-router.get('/:id', getUserWithId);
+router.get('/:id', getUserProfileById);
 router.post('/', addUser);
 router.delete('/:id', deleteUser);
 
