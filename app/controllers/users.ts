@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { maybeResult, checkMaybeResult } from '../helpers';
 import UserModel from '../models/user';
+import { bindNodeCallback } from 'rxjs/observable/bindNodeCallback';
 
 const router = Router();
 
@@ -10,10 +11,31 @@ const getUsers = async (req, res) => {
 };
 
 const getUserProfileById = async (req, res) => {
+  /**
+   * OBSERVABLE PATH
+   */
+  // bindNodeCallback(
+  //     UserModel.findById.bind(UserModel)
+  // )(req.params.id)
+  //       .subscribe(
+  //           (user: any) => res.json(user ? user.getUserProfile() : {}),
+  //           () => res.send('No user with such email'),
+  //           () => console.log('done')
+  //       );
+  //   /**
+  //    * ASYNC AWAIT PATH WITHOUT HELPER
+  //    */
+  //
+  //   const user: any = await UserModel.findById(req.params.id).exec()
+  //       .catch(error => res.send('No user with such email'));
+  //   res.json(user ? user.getUserProfile() : {});
+  //
+  //
+  //   /**
+  //    * ASYNC AWAIT MAYBE PATH WITH HELPER
+  //    */
   checkMaybeResult(
-    ({ result: user }) => {
-      res.json(user ? user.getUserProfile() : {});
-    },
+    ({ result: user }) => res.json(user ? user.getUserProfile() : {}),
     () => res.send('No user with such email')
   )(await maybeResult(UserModel.findById(req.params.id).exec()));
 };
