@@ -56,5 +56,6 @@ typings/
 
 # dotenv environment variables file
 .env
-app/config/aws/.aws-config.json
-app/config/aws/bucket-name.ts
+aws-config.json
+bucket-name.ts
+tinify-key.ts

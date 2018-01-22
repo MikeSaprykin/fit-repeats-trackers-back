@@ -1,4 +1,4 @@
-import * as multer from 'multer';
+import * as _multer from 'multer';
 import { extname } from 'path';
 
 const fileFilter = (req, file, next) => {
@@ -16,7 +16,7 @@ const fileFilter = (req, file, next) => {
   next(error);
 };
 
-export const multer = multer({
-  storage: multer.memoryStorage(),
-  fileFilter,
+export const multer = _multer({
+  storage: _multer.memoryStorage(),
+  // fileFilter,
 });
