@@ -44,10 +44,11 @@ const getUserDetails = async (req, res) => {
   res.json({});
 };
 
-const addUser = async (req, res) => {
-  const user = await UserModel.insertMany({ ...req.body });
-  res.json(user);
-};
+const addUser = async (req, res) =>
+  checkMaybeResult(
+    ({ result: user }) => res.json(user ? user.getUserProfile() : {}),
+    ({ error }) => res.status(400).send({ error })
+  )(await maybeResult(UserModel.insertMany({ ...req.body })));
 
 const deleteUser = async (req, res) => {
   await UserModel.deleteOne({ _id: req.params.id }).exec();

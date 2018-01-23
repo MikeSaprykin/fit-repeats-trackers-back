@@ -1,16 +1,33 @@
 import { Router } from 'express';
 import { multer } from '../config';
 import ProfileService from '../services/profile';
+import { fieldsRequired } from '../middlewares/auth';
+import { checkMaybeResult, maybeResult } from '../helpers/maybe-result';
+
+const avatar = 'avatar';
 
 const router = Router();
 
-router.get('/', (req, res) => {
-  res.send({ token: 'bla' });
-});
-router.post('/avatar', multer.single('avatar'), async (req, res) => {
+const uploadAvatar = async (req, res) => {
   const avatar = await ProfileService.uploadAvatar(req);
   res.json({ avatar });
-});
+};
+
+const updateUserProfile = async (req, res) => {
+  checkMaybeResult(
+    ({ result: user }) => res.send(user ? user.getUserProfile() : {}),
+    err => res.status(400).send('There is an error with your request!')
+  )(await maybeResult(ProfileService.updateProfile(req)));
+};
+
+router.get('/', (req, res) => res.send(req.user.getUserProfile()));
+router.put('/', updateUserProfile);
+router.post(
+  `/${avatar}`,
+  fieldsRequired(avatar),
+  multer.single(avatar),
+  uploadAvatar
+);
 
 export default {
   router,

@@ -4,28 +4,25 @@ import * as bcrypt from 'bcrypt';
 export const initialPassword = bcrypt.hashSync('123456', 10);
 
 const userSchema = new mongoose.Schema({
-  username: { type: String, unique: true, required: 'Username is required' },
-  password: { type: String, default: initialPassword },
+  username: { type: String, unique: true, default: null },
+  password: { type: String, default: initialPassword, required: true },
   initialPasswordChanged: { type: Boolean, default: false },
-  firstName: { type: String },
-  lastName: { type: String },
-  avatarUrl: { type: String },
+  firstName: { type: String, default: null },
+  lastName: { type: String, default: null },
+  avatarUrl: { type: String, default: null },
   refreshToken: { type: String },
   groups: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Group' }],
-  // email: {
-  //     type: String,
-  //     lowercase: true,
-  //     unique: true,
-  //     required: 'Email address is required',
-  //     validate: {
-  //         validator: (value) => {
-  //             let emailRegex = /^([\w-.]+@([\w-]+.)+[\w-]{2,4})?$/;
-  //             return emailRegex.test(value);
-  //         },
-  //         message: 'Invalid email address',
-  //     },
-  //     trim: true,
-  // },
+  email: {
+    type: String,
+    lowercase: true,
+    unique: true,
+    required: true,
+    validate: {
+      validator: val => /^([\w-.]+@([\w-]+.)+[\w-]{2,4})?$/.test(val),
+      message: 'Invalid email address',
+    },
+    trim: true,
+  },
 });
 
 userSchema.methods.getPublicUserData = function() {
@@ -41,6 +38,7 @@ userSchema.methods.getUserProfile = function() {
     firstName: this.firstName,
     lastName: this.lastName,
     avatarUrl: this.avatarUrl,
+    email: this.email,
   };
 };
 

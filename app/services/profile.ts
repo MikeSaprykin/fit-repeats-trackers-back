@@ -1,6 +1,6 @@
-import { tinify } from '../config';
 import { extname } from 'path';
 import AWSService from './aws';
+import UserModel from '../models/user';
 import * as crypto from 'crypto';
 
 const uploadAvatar = async (req): Promise<any> => {
@@ -36,6 +36,12 @@ const generateUploadParams = (Key: string, Body: Buffer) => ({
   Key,
 });
 
+const updateProfile = async req =>
+  await UserModel.findOneAndUpdate({ _id: req.user._id }, req.body, {
+    new: true,
+  }).exec();
+
 export default {
   uploadAvatar,
+  updateProfile,
 };

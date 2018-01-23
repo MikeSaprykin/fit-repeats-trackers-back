@@ -1,4 +1,3 @@
-import { Promise } from 'mongoose';
 import { ifElse } from 'ramda';
 
 interface MaybeResult<T> {
