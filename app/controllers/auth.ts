@@ -3,6 +3,7 @@ import { Router } from 'express';
 import { ifElse, isNil } from 'ramda';
 import { StatusCodes } from '../helpers';
 import AuthService from '../services/auth';
+import { fieldsInBodyRequired } from '../middlewares/auth';
 
 const router = Router();
 
@@ -17,7 +18,7 @@ const loginUser = async (req, res) => {
       res
         .status(StatusCodes.BAD_REQUEST)
         .json(AuthService.noUserOrPasswordInvalidMessage)
-  )(await UserModel.findOne({ username: req.body.username }).exec());
+  )(await UserModel.findOne({ email: req.body.email }).exec());
 };
 
 const refreshToken = async (req, res) => {
@@ -31,8 +32,8 @@ const refreshToken = async (req, res) => {
   )(await AuthService.refreshTokenAndReturnNewTokens(req.body));
 };
 
-router.post('/login', loginUser);
-router.post('/refresh', refreshToken);
+router.post('/login', fieldsInBodyRequired('password', 'email'), loginUser);
+router.post('/refresh', fieldsInBodyRequired('refreshToken'), refreshToken);
 
 export default {
   router,

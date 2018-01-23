@@ -1,5 +1,6 @@
 import { passport } from '../config';
 import { isNotNil } from '../helpers';
+import { StatusCodes } from '../helpers/status-codes';
 
 const jwt = 'jwt';
 
@@ -27,7 +28,7 @@ export const fieldsRequired = (...fields: Array<string>) => (req, res, next) =>
   );
 
 const sendErrorOrPassForward = errors => (req, res, next) =>
-  errors.length ? res.status(400).json({ errors }) : next();
+  errors.length ? res.status(StatusCodes.BAD_REQUEST).json({ errors }) : next();
 
 const generateFieldRequiredErrors = (fields, body) =>
   fields.map(validateFieldName(body)).filter(isNotNil);

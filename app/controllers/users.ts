@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { maybeResult, checkMaybeResult } from '../helpers';
 import UserModel from '../models/user';
 import { bindNodeCallback } from 'rxjs/observable/bindNodeCallback';
+import { StatusCodes } from '../helpers/status-codes';
 
 const router = Router();
 
@@ -47,7 +48,7 @@ const getUserDetails = async (req, res) => {
 const addUser = async (req, res) =>
   checkMaybeResult(
     ({ result: user }) => res.json(user ? user.getUserProfile() : {}),
-    ({ error }) => res.status(400).send({ error })
+    ({ error }) => res.status(StatusCodes.BAD_REQUEST).send({ error })
   )(await maybeResult(UserModel.insertMany({ ...req.body })));
 
 const deleteUser = async (req, res) => {
